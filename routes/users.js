@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const cors = require('cors');
+router.use(cors());
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
@@ -43,6 +45,7 @@ router.get('/checkauth', (req, res) => {
 });
 
 /* GET users listing. */
+//TODO
 router.get('/', function (req, res, next) {
   res.send('respond with a resource');
 });
