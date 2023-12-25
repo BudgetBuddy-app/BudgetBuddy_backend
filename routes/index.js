@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const cors = require('cors');
+router.use(cors());
 
 const db = require('../public/javascripts/db.js');
 const sqlQueries = require('../public/javascripts/sqlQueries.js');
