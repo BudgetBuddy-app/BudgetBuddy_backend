@@ -49,4 +49,6 @@ router.get('/validate', (req, res) => {
     }
 });
 
+//TODO validate the token is valid on every call done to the API
+
 module.exports = router;
