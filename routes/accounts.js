@@ -44,7 +44,6 @@ router.get('/:id', function (req, res) {
 });
 
 router.put('/:id', function (req, res) {
-  console.log(req.body)
   const accountId = req.params.id;
   const sql = "UPDATE accounts SET name = ? WHERE id = ?";
   db.query(sql, [req.body.name, accountId], (err, data) => {
@@ -57,9 +56,17 @@ router.put('/:id', function (req, res) {
   });
 });
 
-//TODO delete
-router.delete('/user', (req, res) => {
-  res.send('Got a DELETE request at /user')
-})
+router.delete('/:id', (req, res) => {
+  const accountId = req.params.id;
+  const sql = "DELETE FROM accounts WHERE id = ?";
+  db.query(sql, [accountId], (err, data) => {
+    if (err) {
+      console.error('Database error:', err);
+      res.status(500).send({ error: 'Database error', details: err });
+    } else {
+      res.status(200).json(data);
+    }
+  });
+});
 
 module.exports = router;
