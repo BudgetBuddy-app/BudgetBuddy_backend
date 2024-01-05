@@ -38,7 +38,7 @@ router.get('/:id', function (req, res) {
       console.error('Database error:', err);
       res.status(500).send({ error: 'Database error', details: err });
     } else {
-      res.status(200).json(data);
+      res.status(200).json(data[0]);
     }
   });
 });

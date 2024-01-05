@@ -5,20 +5,6 @@ router.use(cors());
 
 const db = require('../public/javascripts/db.js');
 
-/*TODO post
-router.post('/', function (req, res, next) {
-  const sql = "INSERT INTO accounts (user_id, name) VALUES (?, ?)";
-  db.query(sql, [req.body.user_id, req.body.name], (err, data) => {
-    if (err) {
-      console.error('Database error:', err);
-      res.status(500).send({ error: 'Database error', details: err });
-    } else {
-      res.status(201).send('Account created');
-    }
-  })
-});
-*/
-
 router.get('/account/:id', function (req, res, next) {
   const accountId = req.params.id;
   const sql = "SELECT * FROM transactions WHERE account_id = ?";
@@ -36,6 +22,44 @@ router.get('/:id', function (req, res, next) {
   const accountId = req.params.id;
   const sql = "SELECT * FROM accounts WHERE id = ?";
   db.query(sql, [accountId], (err, data) => {
+    if (err) {
+      console.error('Database error:', err);
+      res.status(500).send({ error: 'Database error', details: err });
+    } else {
+      res.status(200).json(data[0]);
+    }
+  });
+});
+
+router.post('/', function (req, res, next) {
+  const sql = "INSERT INTO transactions(amount, date, recipient, account_id, notes) VALUES (?, ?, ?, ?, ?)";
+  db.query(sql, [req.body.amount, req.body.date, req.body.recipient, req.body.account_id, req.body.notes], (err, data) => {
+    if (err) {
+      console.error('Database error:', err);
+      res.status(500).send({ error: 'Database error', details: err });
+    } else {
+      res.status(201).send('Transaction created');
+    }
+  })
+});
+
+router.put('/:id', function (req, res) {
+  const transactionId = req.params.id;
+  const sql = "UPDATE transactions SET amount = ?, date = ?, recipient = ?, account_id = ?, notes = ? WHERE id = ?";
+  db.query(sql, [req.body.amount, req.body.date, req.body.recipient, req.body.account_id, req.body.notes, transactionId], (err, data) => {
+    if (err) {
+      console.error('Database error:', err);
+      res.status(500).send({ error: 'Database error', details: err });
+    } else {
+      res.status(200).json(data);
+    }
+  });
+});
+
+router.delete('/:id', (req, res) => {
+  const transactionId = req.params.id;
+  const sql = "DELETE FROM transactions WHERE id = ?";
+  db.query(sql, [transactionId], (err, data) => {
     if (err) {
       console.error('Database error:', err);
       res.status(500).send({ error: 'Database error', details: err });
