@@ -6,7 +6,7 @@ router.use(cors());
 const db = require('../public/javascripts/db.js');
 
 router.post('/', function (req, res, next) {
-  const sql = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
+  const sql = `INSERT INTO users (name, email, password) VALUES (?, ?, ?)`;
   db.query(sql, [req.body.name, req.body.email, req.body.password], (err, data) => {
     if (err) {
       console.error('Database error:', err);
