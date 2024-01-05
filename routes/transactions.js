@@ -20,7 +20,7 @@ router.get('/account/:id', function (req, res, next) {
 
 router.get('/:id', function (req, res, next) {
   const accountId = req.params.id;
-  const sql = `SELECT * FROM accounts WHERE id = ?`;
+  const sql = `SELECT * FROM transactions WHERE id = ?`;
   db.query(sql, [accountId], (err, data) => {
     if (err) {
       console.error('Database error:', err);
