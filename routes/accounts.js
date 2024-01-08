@@ -56,9 +56,21 @@ router.put('/:id', function (req, res) {
   });
 });
 
+//TODO test this when you delete an account,all of the transactions should be left without account
 router.delete('/:id', (req, res) => {
   const accountId = req.params.id;
-  const sql = "DELETE FROM accounts WHERE id = ?";
+
+  let sql = "UPDATE transactions SET account_id = NULL WHERE account_id = ?"
+  db.query(sql, [accountId], (err, data) => {
+    if (err) {
+      console.error('Database error:', err);
+      res.status(500).send({ error: 'Database error', details: err });
+    } else {
+      res.status(200).json(data);
+    }
+  });
+
+  sql = "DELETE FROM accounts WHERE id = ?";
   db.query(sql, [accountId], (err, data) => {
     if (err) {
       console.error('Database error:', err);
