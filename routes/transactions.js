@@ -50,9 +50,9 @@ router.get('/user/:id', function (req, res, next) {
 
 router.post('/', function (req, res, next) {
   const sql = `INSERT INTO transactions
-                (amount, date, recipient, account_id, notes) 
-                VALUES (?, ?, ?, ?, ?)`;
-  db.query(sql, [req.body.amount, req.body.date, req.body.recipient, req.body.account_id, req.body.notes], (err, data) => {
+                (amount, date, recipient, account_id, notes, category) 
+                VALUES (?, ?, ?, ?, ?, ?)`;
+  db.query(sql, [req.body.amount, req.body.date, req.body.recipient, req.body.account_id, req.body.notes, req.body.category], (err, data) => {
     if (err) {
       console.error('Database error:', err);
       res.status(500).send({ error: 'Database error', details: err });
@@ -65,9 +65,9 @@ router.post('/', function (req, res, next) {
 router.put('/:id', function (req, res) {
   const transactionId = req.params.id;
   const sql = `UPDATE transactions 
-                SET amount = ?, date = ?, recipient = ?, account_id = ?, notes = ? 
+                SET amount = ?, date = ?, recipient = ?, account_id = ?, notes = ?, category = ?
                 WHERE id = ?`;
-  db.query(sql, [req.body.amount, req.body.date, req.body.recipient, req.body.account_id, req.body.notes, transactionId], (err, data) => {
+  db.query(sql, [req.body.amount, req.body.date, req.body.recipient, req.body.account_id, req.body.notes, req.body.category, transactionId], (err, data) => {
     if (err) {
       console.error('Database error:', err);
       res.status(500).send({ error: 'Database error', details: err });

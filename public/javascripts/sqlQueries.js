@@ -27,6 +27,7 @@ module.exports = {
             recipient VARCHAR(255),
             account_id INT,
             notes VARCHAR(255),
+            category VARCHAR(255),
             FOREIGN KEY (account_id) REFERENCES accounts(id)
             );`
         }
@@ -56,14 +57,16 @@ module.exports = {
             name: 'Accounts',
             query: `INSERT INTO accounts(user_id, name) VALUES 
                     (1, 'Checking Account'),
-                    (2, 'Savings Account');`
+                    (1, 'revolut'),
+                    (2, 'Checking Account'),
+                    (2, 'revolut');`
         },
         {
             name: 'Transactions',
-            query: `INSERT INTO transactions(amount, date, recipient, account_id, notes) VALUES 
-                    (1000.00, '2023-12-15', 'Lidl', 1, 'Transaction 1'),
-                    (-1000, '2023-12-15', 'Lidl', 1, 'Transaction 3'),
-                    (2000.00, '2023-12-16', 'Mcdonalds', 2, 'Transaction 2');`
+            query: `INSERT INTO transactions(amount, date, recipient, account_id, notes, category) VALUES 
+                    (1000.00, '2023-12-15', 'Lidl', 2, 'Transaction 1', 'groceries'),
+                    (-1000, '2023-12-15', 'Lidl', 2, 'Transaction 3', 'groceries'),
+                    (2000.00, '2023-12-16', 'Mcdonalds', 2, 'Transaction 2', 'travel');`
         }
     ]
 };
