@@ -76,7 +76,7 @@ module.exports = {
         {
             query: `INSERT INTO categories(name) VALUES 
             ('groceries'),
-            ('travel'),
+            ('traveling'),
             ('entertainment'),
             ('utilities');`
         },

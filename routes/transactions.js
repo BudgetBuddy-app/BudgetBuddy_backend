@@ -40,7 +40,7 @@ router.get('/:id', function (req, res, next) {
 router.get('/user/:id', function (req, res, next) {
 
   const userId = req.params.id;
-  sql = `SELECT transactions.*, categories.name AS category_name
+  sql = `SELECT transactions.*, categories.name AS category_name, accounts.name AS account_name
           FROM transactions
           JOIN accounts ON transactions.account_id = accounts.id
           JOIN categories ON transactions.category_id = categories.id

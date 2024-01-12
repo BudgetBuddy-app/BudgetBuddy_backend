@@ -19,7 +19,7 @@ router.post('/transactions/:id', upload.single('file'), async function (req, res
   recipientRow = 0
   amountRow = 1
   dateRow = 2
-  categoryRow = 3
+  categoryNameRow = 3
   notesRow = 4
   accountNameRow = 5
 
@@ -35,9 +35,17 @@ router.post('/transactions/:id', upload.single('file'), async function (req, res
   let accountList = await getAccounts(userId);
   if (accountList == null) { return res.status(500).send({ error: 'error fetching accounts...' }); }
 
+  // get the categoryList to then submit the account ID with each transaction, if doesn't exist, create it
+  let foundCategoryId = -1
+  let categoryList = await getCategories();
+  if (categoryList == null) { return res.status(500).send({ error: 'error fetching categories...' }); }
+
+
+  //TODO optimize the category and account search with hash tables or something
+
   //build SQl command
   console.log("building SQL command...")
-  let sql = "INSERT INTO transactions(recipient, amount, date ,category , notes, account_id) VALUES ";
+  let sql = "INSERT INTO transactions(recipient, amount, date ,category_id , notes, account_id) VALUES ";
   for (let csvRow of parsedData) {
     //find the account_id of this account
     for (i = 0; i < accountList.length; i++) {
@@ -46,7 +54,17 @@ router.post('/transactions/:id', upload.single('file'), async function (req, res
         i = accountList.length;
       }
     }
-    //TODO explain this in the documentation, and in the settings page, also the order of info and columns, in case it's not dhynamic in the future
+
+    //find the category_id of this account
+    for (i = 0; i < categoryList.length; i++) {
+      if (categoryList[i].name == csvRow[categoryNameRow]) {
+        foundCategoryId = categoryList[i].id;
+        i = categoryList.length;
+      }
+    }
+
+
+    //TODO explain this in the documentation, and in the settings page, also the order of info and columns, in case it's not dynamic in the future
     //if the account is not yet registered, create it
     if (foundAccountId == -1) {
 
@@ -65,11 +83,31 @@ router.post('/transactions/:id', upload.single('file'), async function (req, res
       }
     }
 
+    //TODO explain this in the documentation, and in the settings page, also the order of info and columns, in case it's not dynamic in the future
+    //if the category is not yet registered, create it
+    if (foundCategoryId == -1) {
+
+      let createdValue = await createNewCategory(csvRow[categoryNameRow]);
+
+      if (createdValue == null) { return res.status(500).send({ error: 'error fetching categories...' }); }
+
+      categoryList = await getCategories();
+      if (categoryList == null) { return res.status(500).send({ error: 'error fetching categories...' }); }
+
+      for (i = 0; i < categoryList.length; i++) {
+        if (categoryList[i].name == csvRow[categoryNameRow]) {
+          foundCategoryId = categoryList[i].id;
+          i = categoryList.length;
+        }
+      }
+    }
+
     //add the data to the sql command
-    sql += "('" + sanitize(csvRow[recipientRow]) + "', " + sanitize(csvRow[amountRow]) + ", '" + sanitize(csvRow[dateRow]) + "', '" + sanitize(csvRow[categoryRow]) +
+    sql += "('" + sanitize(csvRow[recipientRow]) + "', " + sanitize(csvRow[amountRow]) + ", '" + sanitize(csvRow[dateRow]) + "', '" + sanitize(foundCategoryId) +
       "', '" + sanitize(csvRow[notesRow]) + "', '" + sanitize(foundAccountId) + "'),"
 
     foundAccountId = -1
+    foundCategoryId = -1
   }
 
   //remove extra comma at the end of the command
@@ -134,6 +172,23 @@ function getAccounts(userId) {
   });
 }
 
+function getCategories() {
+  return new Promise((resolve, reject) => {
+    console.log("fetching categories...")
+    let sql3 = "SELECT * FROM categories";
+    db.query(sql3, (err, data) => {
+      if (err) {
+        console.error('Database error:', err);
+        return null;
+      } else {
+        console.log("categories retrieved successfully!");
+        resolve(data);
+      }
+    });
+  });
+}
+
+//todo we should inject the params for safety, not concat strings
 function createNewAccount(userId, newAccountName) {
   return new Promise((resolve, reject) => {
     console.log("Creating new account...")
@@ -144,6 +199,23 @@ function createNewAccount(userId, newAccountName) {
         return null;
       } else {
         console.log("Account created successfully!");
+        resolve(data);
+      }
+    });
+  });
+}
+
+//todo we should inject the params for safety, not concat strings
+function createNewCategory(newCategoryName) {
+  return new Promise((resolve, reject) => {
+    console.log("Creating new category...")
+    let sql2 = "INSERT INTO categories(name) VALUES ('" + newCategoryName + "')"
+    db.query(sql2, (err, data) => {
+      if (err) {
+        console.error('Database error:', err);
+        return null;
+      } else {
+        console.log("Category created successfully!");
         resolve(data);
       }
     });
