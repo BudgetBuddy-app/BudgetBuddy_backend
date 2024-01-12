@@ -19,16 +19,24 @@ module.exports = {
                 );`
         },
         {
+            name: 'Categories',
+            query: `CREATE TABLE IF NOT EXISTS categories(
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(255) UNIQUE
+            );`
+        },
+        {
             name: 'Transactions',
             query: `CREATE TABLE IF NOT EXISTS transactions(
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            amount DECIMAL(10, 2),
-            date DATE,
-            recipient VARCHAR(255),
-            account_id INT,
-            notes VARCHAR(255),
-            category VARCHAR(255),
-            FOREIGN KEY (account_id) REFERENCES accounts(id)
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                amount DECIMAL(10, 2),
+                date DATE,
+                recipient VARCHAR(255),
+                notes VARCHAR(255),
+                account_id INT,
+                category_id INT,
+                FOREIGN KEY (category_id) REFERENCES categories(id),
+                FOREIGN KEY (account_id) REFERENCES accounts(id)
             );`
         }
     ],
@@ -44,6 +52,10 @@ module.exports = {
         {
             name: 'dropUsersTableQuery',
             query: `DROP TABLE IF EXISTS users;`
+        },
+        {
+            name: 'dropCategoriesTableQuery',
+            query: `DROP TABLE IF EXISTS categories;`
         }
     ],
     insertDummyData: [
@@ -57,16 +69,27 @@ module.exports = {
             name: 'Accounts',
             query: `INSERT INTO accounts(user_id, name) VALUES 
                     (1, 'Checking Account'),
-                    (1, 'revolut'),
-                    (2, 'Checking Account'),
-                    (2, 'revolut');`
+                    (2, 'revolut'),
+                    (1, 'Wise'),
+                    (2, 'Cash');`
+        },
+        {
+            query: `INSERT INTO categories(name) VALUES 
+            ('groceries'),
+            ('travel'),
+            ('entertainment'),
+            ('utilities');`
         },
         {
             name: 'Transactions',
-            query: `INSERT INTO transactions(amount, date, recipient, account_id, notes, category) VALUES 
-                    (1000.00, '2023-12-15', 'Lidl', 2, 'Transaction 1', 'groceries'),
-                    (-1000, '2023-12-15', 'Lidl', 2, 'Transaction 3', 'groceries'),
-                    (2000.00, '2023-12-16', 'Mcdonalds', 2, 'Transaction 2', 'travel');`
+            query: `INSERT INTO transactions(amount, date, recipient, account_id, notes, category_id) VALUES 
+                    (-30.00, '2023-12-19', 'Lidl', 1, 'Transaction 1', 1),
+                    (140.10, '2023-12-15', 'Aldi', 1, 'Transaction 2', 3),
+                    (-3480.00, '2023-12-12', 'Spar', 1, 'Transaction 3', 1),
+                    (-12.02, '2023-12-11', 'Papitos', 2, 'Transaction 4', 2),
+                    (100.00, '2023-12-02', 'Gray u 20', 2, 'Transaction 5', 1),
+                    (-1000, '2023-12-15', 'Rossman', 2, 'Transaction 6', 2),
+                    (2000.00, '2023-12-16', 'Mcdonalds', 2, 'Transaction 7', 1);`
         }
     ]
 };

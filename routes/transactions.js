@@ -7,7 +7,10 @@ const db = require('../public/javascripts/db.js');
 
 router.get('/account/:id', function (req, res, next) {
   const accountId = req.params.id;
-  const sql = `SELECT * FROM transactions WHERE account_id = ?`;
+  const sql = `SELECT transactions.*, categories.name AS category_name
+              FROM transactions
+              INNER JOIN categories ON transactions.category_id = categories.id
+              WHERE transactions.account_id = ?`;
   db.query(sql, [accountId], (err, data) => {
     if (err) {
       console.error('Database error:', err);
@@ -19,9 +22,12 @@ router.get('/account/:id', function (req, res, next) {
 });
 
 router.get('/:id', function (req, res, next) {
-  const accountId = req.params.id;
-  const sql = `SELECT * FROM transactions WHERE id = ?`;
-  db.query(sql, [accountId], (err, data) => {
+  const transactionId = req.params.id;
+  const sql = `SELECT transactions.*, categories.name AS category_name
+              FROM transactions
+              INNER JOIN categories ON transactions.category_id = categories.id
+              WHERE transactions.id = ?`;
+  db.query(sql, [transactionId], (err, data) => {
     if (err) {
       console.error('Database error:', err);
       res.status(500).send({ error: 'Database error', details: err });
@@ -34,10 +40,11 @@ router.get('/:id', function (req, res, next) {
 router.get('/user/:id', function (req, res, next) {
 
   const userId = req.params.id;
-  const sql = `SELECT transactions.*
-                FROM transactions
-                JOIN accounts ON transactions.account_id = accounts.id
-                WHERE accounts.user_id = ?;`;
+  sql = `SELECT transactions.*, categories.name AS category_name
+          FROM transactions
+          JOIN accounts ON transactions.account_id = accounts.id
+          JOIN categories ON transactions.category_id = categories.id
+          WHERE accounts.user_id = ?;`;
   db.query(sql, [userId], (err, data) => {
     if (err) {
       console.error('Database error:', err);
@@ -48,11 +55,14 @@ router.get('/user/:id', function (req, res, next) {
   });
 });
 
-router.post('/', function (req, res, next) {
+router.post('/', async function (req, res, next) {
+
+  category_id = await getCategoryId(req.body.category)
+
   const sql = `INSERT INTO transactions
-                (amount, date, recipient, account_id, notes, category) 
+                (amount, date, recipient, account_id, notes, category_id) 
                 VALUES (?, ?, ?, ?, ?, ?)`;
-  db.query(sql, [req.body.amount, req.body.date, req.body.recipient, req.body.account_id, req.body.notes, req.body.category], (err, data) => {
+  db.query(sql, [req.body.amount, req.body.date, req.body.recipient, req.body.account_id, req.body.notes, category_id], (err, data) => {
     if (err) {
       console.error('Database error:', err);
       res.status(500).send({ error: 'Database error', details: err });
@@ -62,12 +72,15 @@ router.post('/', function (req, res, next) {
   })
 });
 
-router.put('/:id', function (req, res) {
+router.put('/:id', async function (req, res) {
+
+  category_id = await getCategoryId(req.body.category)
+
   const transactionId = req.params.id;
-  const sql = `UPDATE transactions 
-                SET amount = ?, date = ?, recipient = ?, account_id = ?, notes = ?, category = ?
+  const sql2 = `UPDATE transactions 
+                SET amount = ?, date = ?, recipient = ?, account_id = ?, notes = ?, category_id = ?
                 WHERE id = ?`;
-  db.query(sql, [req.body.amount, req.body.date, req.body.recipient, req.body.account_id, req.body.notes, req.body.category, transactionId], (err, data) => {
+  db.query(sql2, [req.body.amount, req.body.date, req.body.recipient, req.body.account_id, req.body.notes, category_id, transactionId], (err, data) => {
     if (err) {
       console.error('Database error:', err);
       res.status(500).send({ error: 'Database error', details: err });
@@ -89,5 +102,34 @@ router.delete('/:id', (req, res) => {
     }
   });
 });
+
+function getCategoryId(categoryName) {
+  return new Promise((resolve, reject) => {
+    const sql1 = `SELECT id
+                 FROM categories
+                 WHERE name = ?`;
+    db.query(sql1, [categoryName], (err, data) => {
+      if (err) {
+        console.error('Database error:', err);
+        reject(err);
+      } else if (data.length > 0) {
+        let category_id = data[0].id;
+        resolve(category_id);
+      } else {
+        // Category does not exist, create it
+        const sql2 = `INSERT INTO categories (name) VALUES (?)`;
+        db.query(sql2, [categoryName], (err, data) => {
+          if (err) {
+            console.error('Database error:', err);
+            reject(err);
+          } else {
+            let category_id = data.insertId;
+            resolve(category_id);
+          }
+        });
+      }
+    });
+  });
+}
 
 module.exports = router;
