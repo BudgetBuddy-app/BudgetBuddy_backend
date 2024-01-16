@@ -1,36 +1,28 @@
 const mysql = require('mysql2')
 
-const connection = mysql.createConnection({
+const pool = mysql.createPool({
     host: 'localhost',
     user: 'root',
-    password: 'root'
-})
+    password: 'root',
+    connectionLimit: 10
+});
+//TODO important, check this connectionLimit
 
-connection.connect((err) => {
+pool.getConnection((err, connection) => {
     if (err) {
-        console.error('Error connecting to the database:', err.stack);
+        console.error('Error getting connection:', err.stack);
         return;
     }
-    console.log('Connected to the database as id', connection.threadId);
-
-    // Check if the database exists
-    connection.query('CREATE DATABASE IF NOT EXISTS BudgetBuddyDB', (err, results) => {
+    console.log('Connection obtained successfully');
+    // Select the database
+    connection.changeUser({ database: 'BudgetBuddyDB' }, (err) => {
         if (err) {
-            console.error('Error creating database:', err.stack);
+            console.error('Error selecting database:', err.stack);
             return;
         }
-        console.log('Database created/connected successfully');
-
-        // Select the database
-        connection.changeUser({ database: 'BudgetBuddyDB' }, (err) => {
-            if (err) {
-                console.error('Error selecting database:', err.stack);
-                return;
-            }
-            console.log('Database selected successfully');
-        });
+        console.log('Database selected successfully');
+        pool.releaseConnection(connection);
     });
 });
 
-module.exports = connection;
-
+module.exports = pool;
