@@ -38,6 +38,28 @@ module.exports = {
                 FOREIGN KEY (category_id) REFERENCES categories(id),
                 FOREIGN KEY (account_id) REFERENCES accounts(id)
             );`
+        },
+        {
+            name: 'Investments',
+            query: `CREATE TABLE IF NOT EXISTS investments(
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT,
+                symbol VARCHAR(255),
+                last_refreshed DATE,
+                name VARCHAR(255),
+                exchange VARCHAR(255),
+                currency_symbol VARCHAR(255),
+                price DECIMAL(10, 4),
+                currency VARCHAR(255),
+                owned_shares DECIMAL(10, 4),
+                average_purchase_price DECIMAL(10, 4),
+                FOREIGN KEY (user_id) REFERENCES users(id)
+            );`
+        },
+        {
+            name: 'InsertAdmin',
+            query: `INSERT INTO users(name, email, password) VALUES 
+                ('Admin 1', 'admin1@mail.com', '123');`
         }
     ],
     dropTables: [
@@ -48,6 +70,10 @@ module.exports = {
         {
             name: 'dropAccountsTableQuery',
             query: `DROP TABLE IF EXISTS accounts;`
+        },
+        {
+            name: 'dropInvestmentsTableQuery',
+            query: `DROP TABLE IF EXISTS investments;`
         },
         {
             name: 'dropUsersTableQuery',
@@ -68,12 +94,13 @@ module.exports = {
         {
             name: 'Accounts',
             query: `INSERT INTO accounts(user_id, name) VALUES 
-                    (1, 'Checking Account'),
+                    (3, 'Checking Account'),
                     (2, 'revolut'),
-                    (1, 'Wise'),
+                    (3, 'Wise'),
                     (2, 'Cash');`
         },
         {
+            name: 'Categories',
             query: `INSERT INTO categories(name) VALUES 
             ('groceries'),
             ('traveling'),
@@ -90,6 +117,13 @@ module.exports = {
                     (100.00, '2023-12-02', 'Gray u 20', 2, 'Transaction 5', 1),
                     (-1000, '2023-12-15', 'Rossman', 2, 'Transaction 6', 2),
                     (2000.00, '2023-12-16', 'Mcdonalds', 2, 'Transaction 7', 1);`
+        },
+        {
+            name: 'Investments',
+            query: `INSERT INTO investments(user_id, symbol, last_refreshed, name, exchange, currency_symbol, price, currency, owned_shares, average_purchase_price) 
+                    VALUES 
+                    (1, 'VWCE.DE', '2024-01-18', 'Vanguard FTSE All-World UCITS ETF', 'GER', '€', 107.22, 'EUR', 1.2628, 102.69),
+                    (1, 'VUAA.MI', '2024-01-18', 'Vanguard S&P 500 UCITS ETF', 'MIL', '€', 82.47, 'EUR', 1.1066, 79.06);`
         }
     ]
 };
