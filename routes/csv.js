@@ -63,8 +63,6 @@ router.post('/transactions/:id', upload.single('file'), async function (req, res
       }
     }
 
-
-    //TODO explain this in the documentation, and in the settings page, also the order of info and columns, in case it's not dynamic in the future
     //if the account is not yet registered, create it
     if (foundAccountId == -1) {
 
@@ -83,7 +81,6 @@ router.post('/transactions/:id', upload.single('file'), async function (req, res
       }
     }
 
-    //TODO explain this in the documentation, and in the settings page, also the order of info and columns, in case it's not dynamic in the future
     //if the category is not yet registered, create it
     if (foundCategoryId == -1) {
 
