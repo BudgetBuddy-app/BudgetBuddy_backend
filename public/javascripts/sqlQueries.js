@@ -15,7 +15,8 @@ module.exports = {
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 user_id INT,
                 name VARCHAR(255),
-                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+                UNIQUE (user_id, name)
                 );`
         },
         {
