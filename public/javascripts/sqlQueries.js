@@ -123,8 +123,8 @@ module.exports = {
             name: 'Investments',
             query: `INSERT INTO investments(user_id, symbol, last_refreshed, name, exchange, currency_symbol, price, currency, owned_shares, average_purchase_price) 
                     VALUES 
-                    (1, 'VWCE.DE', '2024-01-18', 'Vanguard FTSE All-World UCITS ETF', 'GER', '€', 107.22, 'EUR', 1.2628, 102.69),
-                    (1, 'VUAA.MI', '2024-01-18', 'Vanguard S&P 500 UCITS ETF', 'MIL', '€', 82.47, 'EUR', 1.1066, 79.06);`
+                    (1, 'VWCE.DE', '2024-01-18', 'Vanguard FTSE All-World UCITS ETF', 'GER', '€', 107.33, 'EUR', 1.3421, 103.14),
+                    (1, 'VUAA.MI', '2024-01-18', 'Vanguard S&P 500 UCITS ETF', 'MIL', '€', 82.47, 'EUR', 1.1613, 79.34);`
         }
     ]
 };
