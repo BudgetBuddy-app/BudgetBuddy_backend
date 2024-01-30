@@ -10,6 +10,18 @@ module.exports = {
                 );`
         },
         {
+            name: 'Budgets',
+            query: `CREATE TABLE IF NOT EXISTS budgets(
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(255),
+                start_date DATE,
+                end_date DATE,
+                amount DECIMAL(10, 2),
+                user_id INT,
+                FOREIGN KEY (user_id) REFERENCES users(id)
+            );`
+        },
+        {
             name: 'Accounts',
             query: `CREATE TABLE IF NOT EXISTS accounts(
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -77,6 +89,10 @@ module.exports = {
             query: `DROP TABLE IF EXISTS investments;`
         },
         {
+            name: 'dropBudgetsTableQuery',
+            query: `DROP TABLE IF EXISTS budgets;`
+        },
+        {
             name: 'dropUsersTableQuery',
             query: `DROP TABLE IF EXISTS users;`
         },
@@ -125,6 +141,17 @@ module.exports = {
                     VALUES 
                     (1, 'VWCE.DE', '2024-01-18', 'Vanguard FTSE All-World UCITS ETF', 'GER', '€', 107.33, 'EUR', 1.3421, 103.14),
                     (1, 'VUAA.MI', '2024-01-18', 'Vanguard S&P 500 UCITS ETF', 'MIL', '€', 82.47, 'EUR', 1.1613, 79.34);`
+        },
+        {
+            name: 'Budgets',
+            query: `INSERT INTO budgets (name, start_date, end_date, amount, user_id) VALUES 
+                    ('2023_11', '2023-11-01', '2023-11-30', 350.00, 1),
+                    ('2023_12', '2023-12-01', '2023-12-31', 500.00, 1),
+                    ('2024_01', '2024-01-01', '2024-01-31', 500.00, 1),
+                    ('2024_02', '2024-02-01', '2024-02-29', 500.00, 1),
+                    ('Budget 1', '2024-01-01', '2024-12-31', 5000.00, 2),
+                    ('Budget 2', '2024-02-01', '2024-02-28', 3000.00, 2),
+                    ('Budget 3', '2024-03-01', '2024-03-31', 4000.00, 3);`
         }
     ]
 };

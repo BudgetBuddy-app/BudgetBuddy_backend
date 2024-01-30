@@ -99,19 +99,8 @@ router.post('/transactions/:id', upload.single('file'), async function (req, res
       }
     }
 
-    // Create a new Date object from the CSV row
-    let dateObj = new Date(csvRow[dateRow]);
-
-    // Subtract one day from the date
-    dateObj.setDate(dateObj.getDate() + 1);
-
-    // Format the date to 'yyyy-mm-dd'
-    let formattedDate = dateObj.getFullYear() + '-' +
-      String(dateObj.getMonth() + 1).padStart(2, '0') + '-' +
-      String(dateObj.getDate()).padStart(2, '0');
-
     //add the data to the sql command
-    sql += "('" + sanitize(csvRow[recipientRow]) + "', " + sanitize(csvRow[amountRow]) + ", '" + formattedDate + "', '" + sanitize(foundCategoryId) +
+    sql += "('" + sanitize(csvRow[recipientRow]) + "', " + sanitize(csvRow[amountRow]) + ", '" + sanitize(csvRow[dateRow]) + "', '" + sanitize(foundCategoryId) +
       "', '" + sanitize(csvRow[notesRow]) + "', '" + sanitize(foundAccountId) + "'),"
 
     foundAccountId = -1
