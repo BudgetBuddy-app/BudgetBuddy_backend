@@ -6,7 +6,7 @@ const pool = mysql.createPool({
     password: 'root',
     connectionLimit: 10
 });
-//TODO important, check this connectionLimit
+//TODO important, check this connectionLimit, maybe make a env variable out of it
 
 pool.getConnection((err, connection) => {
     if (err) {

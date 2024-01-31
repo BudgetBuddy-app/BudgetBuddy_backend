@@ -63,6 +63,4 @@ router.delete('/:id', (req, res) => {
   });
 });
 
-//TODO hash passwords when creating user, and when updating the password, also probably when validating
-
 module.exports = router;

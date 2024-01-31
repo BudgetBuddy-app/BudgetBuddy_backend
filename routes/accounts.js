@@ -60,13 +60,11 @@ router.put('/:id', function (req, res) {
   });
 });
 
-//TODO test this when you delete an account, all of the transactions should be left without account
-// account is associated with the user, not transaction, setting transaction without account desociates it from the user
-//so maybe just delete them, but give the iser a warning on the frontend
 router.delete('/:id', (req, res) => {
   const accountId = req.params.id;
 
-  let sql = "UPDATE transactions SET account_id = NULL WHERE account_id = ?"
+  //delete all transactions related to this account before deleting account
+  let sql = "DELETE FROM transactions WHERE account_id = ?"
   db.query(sql, [accountId], (err, data) => {
     if (err) {
       console.error('Database error:', err);
