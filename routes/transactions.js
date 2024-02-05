@@ -4,6 +4,7 @@ const cors = require('cors');
 router.use(cors());
 
 const db = require('../public/javascripts/db.js');
+const { convertToLocalTimezone } = require('../utils/timeFuncs.js');
 
 router.get('/account/:id', function (req, res, next) {
   const accountId = req.params.id;
@@ -16,6 +17,9 @@ router.get('/account/:id', function (req, res, next) {
       console.error('Database error:', err);
       res.status(500).send({ error: 'Database error', details: err });
     } else {
+      data.forEach((item) => {
+        item.date = convertToLocalTimezone(item.date)
+      });
       res.status(200).json(data);
     }
   });
@@ -32,6 +36,7 @@ router.get('/:id', function (req, res, next) {
       console.error('Database error:', err);
       res.status(500).send({ error: 'Database error', details: err });
     } else {
+      data[0].date = convertToLocalTimezone(data[0].date)
       res.status(200).json(data[0]);
     }
   });
@@ -50,6 +55,9 @@ router.get('/user/:id', function (req, res, next) {
       console.error('Database error:', err);
       res.status(500).send({ error: 'Database error', details: err });
     } else {
+      data.forEach((item) => {
+        item.date = convertToLocalTimezone(item.date)
+      });
       res.status(200).json(data);
     }
   });
@@ -103,6 +111,7 @@ router.delete('/:id', (req, res) => {
   });
 });
 
+//aux functions
 function getCategoryId(categoryName) {
   return new Promise((resolve, reject) => {
     const sql1 = `SELECT id

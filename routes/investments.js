@@ -4,6 +4,7 @@ const cors = require('cors');
 router.use(cors());
 
 const db = require('../public/javascripts/db.js');
+const { convertToLocalTimezone } = require('../utils/timeFuncs.js');
 
 router.post('/', function (req, res) {
   const sql = `INSERT INTO investments 
@@ -29,6 +30,9 @@ router.get('/user/:id', function (req, res) {
       console.error('Database error:', err);
       res.status(500).send({ error: 'Database error', details: err });
     } else {
+      data.forEach((item) => {
+        item.last_refreshed = convertToLocalTimezone(item.last_refreshed)
+      });
       res.status(200).json(data);
     }
   });
@@ -42,6 +46,7 @@ router.get('/:id', function (req, res) {
       console.error('Database error:', err);
       res.status(500).send({ error: 'Database error', details: err });
     } else {
+      data[0].last_refreshed = convertToLocalTimezone(data[0].last_refreshed)
       res.status(200).json(data[0]);
     }
   });
