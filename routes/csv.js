@@ -2,13 +2,16 @@ const express = require('express');
 const router = express.Router();
 const cors = require('cors');
 router.use(cors());
+const path = require('path');
 
 const db = require('../public/javascripts/db.js');
 
 var multer = require('multer'); // for file handling
 const upload = multer({ dest: 'uploads/' }); // Set up multer to store files in temporary directory
 
+const { stringify } = require('csv-stringify/sync');
 const { parse } = require('csv-parse');
+const { convertToLocalTimezone } = require('../utils/timeFuncs.js');
 const fs = require('fs');
 
 router.post('/transactions/:id', upload.single('file'), async function (req, res, next) {
@@ -124,7 +127,6 @@ router.post('/transactions/:id', upload.single('file'), async function (req, res
 
 });
 
-//TODO delete /uploads file after using
 function parseCSVData(filepath, firstRowWithData) {
 
   currentRow = 0
@@ -144,6 +146,13 @@ function parseCSVData(filepath, firstRowWithData) {
       })
       .on('end', () => {
         console.log("data parsed successfully!");
+
+        //remove the file after use
+        fs.unlink(filepath, (err) => {
+          if (err && err.code !== 'ENOENT') {
+            console.error('Error deleting file:', err);
+          }
+        });
 
         resolve(parsedData);
       })
@@ -185,7 +194,7 @@ function getCategories() {
   });
 }
 
-//todo we should inject the params for safety, not concat strings
+//TODO we should inject the params for safety, not concat strings
 function createNewAccount(userId, newAccountName) {
   return new Promise((resolve, reject) => {
     console.log("Creating new account...")
@@ -202,7 +211,7 @@ function createNewAccount(userId, newAccountName) {
   });
 }
 
-//todo we should inject the params for safety, not concat strings
+//TODO we should inject the params for safety, not concat strings
 function createNewCategory(newCategoryName) {
   return new Promise((resolve, reject) => {
     console.log("Creating new category...")
@@ -229,5 +238,63 @@ function sanitize(value) {
 
   return value;
 }
+
+//export transactions CSV
+router.get('/transactions/user/:id', function (req, res) {
+  const accountId = req.params.id;
+  sql = `SELECT transactions.*, categories.name AS category_name, accounts.name AS account_name
+          FROM transactions
+          JOIN accounts ON transactions.account_id = accounts.id
+          JOIN categories ON transactions.category_id = categories.id
+          WHERE accounts.user_id = ?;`;
+  db.query(sql, [accountId], (err, data) => {
+    if (err) {
+      console.error('Database error:', err);
+      res.status(500).send({ error: 'Database error', details: err });
+    } else {
+
+      //format for CSV
+      let auxLine = ['recipient', 'amount', 'date', 'category', 'notes', 'account']
+      let auxCSVstream = [auxLine]
+
+      for (i = 0; i < data.length; i++) {
+        let formattedDate = convertToLocalTimezone(data[i].date)
+        auxLine = [data[i].recipient, data[i].amount, formattedDate, data[i].category_name, data[i].notes, data[i].account_name]
+
+        auxCSVstream[i + 1] = auxLine
+      }
+
+      // Convert the CSV data to a string
+      const csvContent = stringify(auxCSVstream);
+
+      // Define the filename and path where you want to store the CSV file
+      const fileName = `${accountId}_transactions.csv`;
+      const filePath = path.join(__dirname, fileName);
+
+      // Write the CSV data to a file
+      fs.writeFile(filePath, csvContent, 'utf8', (err) => {
+        if (err) {
+          console.error('Error writing file:', err);
+          res.status(500).send({ error: 'Error writing file', details: err });
+        } else {
+          // Send the file back to the client
+          res.download(filePath, (err) => {
+            if (err) {
+              console.error('Error sending file:', err);
+              res.status(500).send({ error: 'Error sending file', details: err });
+            } else {
+              // Delete the file after sending it
+              fs.unlink(filePath, (err) => {
+                if (err && err.code !== 'ENOENT') {
+                  console.error('Error deleting file:', err);
+                }
+              });
+            }
+          });
+        }
+      });
+    }
+  });
+});
 
 module.exports = router;
