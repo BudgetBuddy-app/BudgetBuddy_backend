@@ -1,12 +1,12 @@
 const mysql = require('mysql2')
+require('dotenv').config();
 
 const pool = mysql.createPool({
     host: 'localhost',
     user: 'root',
     password: 'root',
-    connectionLimit: 10
+    connectionLimit: (process.env.CONNECTION_LIMIT || 10)
 });
-//TODO important, check this connectionLimit
 
 pool.getConnection((err, connection) => {
     if (err) {

@@ -7,8 +7,10 @@ const logger = require('morgan');
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const accountsRouter = require('./routes/accounts');
+const budgetsRouter = require('./routes/budgets');
 const transactionsRouter = require('./routes/transactions');
 const categoriesRouter = require('./routes/categories');
+const investmentsRouter = require('./routes/investments');
 const csvRouter = require('./routes/csv');
 const authRouter = require('./routes/auth');
 
@@ -27,8 +29,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/accounts', accountsRouter);
+app.use('/budgets', budgetsRouter);
 app.use('/transactions', transactionsRouter);
 app.use('/categories', categoriesRouter);
+app.use('/investments', investmentsRouter);
 app.use('/csv', csvRouter);
 app.use('/auth', authRouter);
 
