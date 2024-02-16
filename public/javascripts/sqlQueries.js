@@ -71,8 +71,12 @@ module.exports = {
         },
         {
             name: 'InsertAdmin',
-            query: `INSERT INTO users(name, email, password) VALUES 
-                ('Admin 1', 'admin1@mail.com', '123');`
+            query: `INSERT INTO users (name, email, password)
+            SELECT 'Admin  1', 'admin1@mail.com', '123'
+            WHERE NOT EXISTS (
+                SELECT  1 FROM users
+                WHERE name = 'Admin  1' AND email = 'admin1@mail.com'
+            );`
         }
     ],
     dropTables: [
