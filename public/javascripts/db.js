@@ -3,16 +3,20 @@ require('dotenv').config();
 
 const sqlQueries = require('./sqlQueries.js');
 
-//TODO make DB password depend on .env? or on compose.yaml?
-//TODO if using dev environment, hot should be "localhost", if using docker, it should be "mysql", maybe add to env
 //TODO this entire file could probably be optimized removing promises for asyncs and whatnot
 
-//TODO test dev after docker, se if I didn't break the dev server
+let hostNameEnv
+if (process.env.MYSQL_MODE == 'local') {
+    hostNameEnv = 'localhost'
+} else {
+    //both 'docker' and leaving the env empty will result in this
+    hostNameEnv = 'mysql'
+}
 
 const pool = mysql.createPool({
-    host: 'mysql',
+    host: hostNameEnv,
     user: 'root',
-    password: 'root',
+    password: (process.env.DB_PASSWORD || 'root'),
     connectionLimit: (process.env.CONNECTION_LIMIT || 10)
 });
 
