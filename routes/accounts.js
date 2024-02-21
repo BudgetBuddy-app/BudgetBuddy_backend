@@ -95,9 +95,9 @@ router.get('/statistics/user/:id', function (req, res) {
                   EXTRACT(YEAR FROM t.date) AS year,
                   EXTRACT(MONTH FROM t.date) AS month,
                   SUM(t.amount) AS transactionSum
-                FROM Users u
-                JOIN Accounts a ON u.id = a.user_id
-                JOIN Transactions t ON a.id = t.account_id
+                FROM users u
+                JOIN accounts a ON u.id = a.user_id
+                JOIN transactions t ON a.id = t.account_id
                 WHERE u.id = ?
                 GROUP BY a.name, year, month
                 ORDER BY year, month, a.name`;

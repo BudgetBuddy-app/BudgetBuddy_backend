@@ -1,3 +1,7 @@
+require('dotenv').config();
+
+let passwordVariable = process.env.ADMIN_PASSWORD || 'password'
+
 module.exports = {
     createTables: [
         {
@@ -71,8 +75,13 @@ module.exports = {
         },
         {
             name: 'InsertAdmin',
-            query: `INSERT INTO users(name, email, password) VALUES 
-                ('Admin 1', 'admin1@mail.com', '123');`
+            query: `INSERT INTO users (name, email, password)
+                    SELECT 'Admin  1', 'admin1@mail.com', '${passwordVariable}'
+                    FROM DUAL
+                    WHERE NOT EXISTS (
+                        SELECT * FROM users
+                        WHERE email = 'admin1@mail.com'
+                    );`
         }
     ],
     dropTables: [

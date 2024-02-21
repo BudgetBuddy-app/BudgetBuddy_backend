@@ -250,7 +250,7 @@ router.get('/transactions/user/:id', function (req, res) {
   db.query(sql, [accountId], (err, data) => {
     if (err) {
       console.error('Database error:', err);
-      res.status(500).send({ error: 'Database error', details: err });
+      return res.status(500).send({ error: 'Database error', details: err });
     } else {
 
       //format for CSV
@@ -275,13 +275,13 @@ router.get('/transactions/user/:id', function (req, res) {
       fs.writeFile(filePath, csvContent, 'utf8', (err) => {
         if (err) {
           console.error('Error writing file:', err);
-          res.status(500).send({ error: 'Error writing file', details: err });
+          return res.status(500).send({ error: 'Error writing file', details: err });
         } else {
           // Send the file back to the client
           res.download(filePath, (err) => {
             if (err) {
               console.error('Error sending file:', err);
-              res.status(500).send({ error: 'Error sending file', details: err });
+              return res.status(500).send({ error: 'Error sending file', details: err });
             } else {
               // Delete the file after sending it
               fs.unlink(filePath, (err) => {
